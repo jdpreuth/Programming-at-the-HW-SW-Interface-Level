@@ -1,0 +1,72 @@
+Caeser Shift Pseudocode
+
+//Declare Variables 
+cursor	<-	address of first	//The pointer to the current node being worked with
+next	<-	value at cursor		//The memory address of the next node in the linked list          
+char	<-	byte at cursor+4	//The current ascii value of the char in the string
+string	<-	address of first	//The memory address of the string to be printed                                       
+key 	<-	value at shift 		//The key to be used for the caeser shift
+count	<-	5					//Keeps track of what byte in the string the char is 
+
+
+SHIFT:
+	if char = 0 goto NEXT_NODE 						//Gets the next node if the current char is the null character
+	if next <= 0 goto PRINT 						//Outputs the encoded/decoded string if all characters have been shifted 
+	if char <= 65 && char >= 90 goto NEXT_CHAR		//Skips to the next character if the current character isn't an uppercase letter 
+		char += key 								//Shift the character by the given key
+		if char < 65 goto ADD 			
+		if char > 90 goto SUBTRACT
+		goto NEXT_CHAR
+
+	//Wraps the caesar shift around from z to a
+	SUBTRACT:
+		char -= 26
+		goto NEXT_CHAR
+
+	//Wraps the caesar shift around form a to z
+	ADD:
+		char += 26
+		goto NEXT_CHAR
+
+	NEXT_CHAR:
+		char <- byte at cursor + count 
+		count++
+
+	NEXT_NODE:
+		jal GET_NEXT_NODE
+		goto SHIFT 
+
+PRINT:
+	cursor = address of first
+	next = value at cursor
+
+	TRAVERSE: 
+		if next <= 0 goto TERMINATE
+		print string 
+		print space
+		jal GET_NEXT_NODE  
+		b TRAVERSE 
+
+
+TERMINATE:
+	terminate
+
+
+GET_NEXT_NODE:
+		cursor <- next 				//Moves the cursor to the next node in the linked list
+		next <- value at cursor 	//Sets the next reference to the next node in the linked list
+		char <- byte at cursor+4	//Sets value to the value stored in the next node
+		string <- value at cursor+4
+		count <- 5
+		jr ra 
+
+### START DATA ###
+.data
+shift:  .word     -3
+first:  .word     node2
+        .asciiz   "HELLO"
+node2:  .word     node3
+        .asciiz   "CAESAR"
+node3:  .word     -1
+        .asciiz   "CIPHER!!!"
+### END DATA ###
